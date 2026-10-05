@@ -19,6 +19,7 @@ MARKET = {
     "outcomes": '["Yes", "No"]', "outcomePrices": '["0.78", "0.22"]',
     "clobTokenIds": f'["{YES}", "{NO}"]',
     "volumeNum": 541010.5, "volume24hr": 1200, "liquidityNum": 9000,
+    "bestBid": 0.77, "bestAsk": 0.79,
     "endDate": "2026-12-10T00:00:00Z", "active": True, "closed": False,
 }
 LADDER = [
@@ -78,11 +79,13 @@ class ClientTests(FakeAPITestCase):
         self.assertEqual(m["outcomes"][0], {"name": "Yes", "price": 0.78, "token_id": YES})
         self.assertIsNone(m["label"])  # empty groupItemTitle -> None
         self.assertEqual(m["url"], "https://polymarket.com/market/fed-hike")
+        self.assertEqual((m["best_bid"], m["best_ask"]), (0.77, 0.79))
 
     def test_normalize_tolerates_missing_and_bad_fields(self):
         m = pm.normalize_market({"outcomes": "not json", "slug": None})
         self.assertEqual(m["outcomes"], [])
         self.assertIsNone(m["url"])
+        self.assertIsNone(m["best_bid"])  # empty side of the book
 
     def test_market_by_slug_and_id(self):
         self.assertEqual(pm.market("fed-hike")["condition_id"], "0xabc")

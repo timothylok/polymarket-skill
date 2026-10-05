@@ -89,6 +89,11 @@ def normalize_market(m):
         "volume": _num(m.get("volumeNum", m.get("volume"))),
         "volume_24h": _num(m.get("volume24hr")),
         "liquidity": _num(m.get("liquidityNum", m.get("liquidity"))),
+        # Top of the Yes book, as Gamma caches it; None when that side is empty.
+        # outcomePrices is the bid/ask midpoint, so a wide or one-sided book
+        # makes the listed price meaningless (polywatch skips those).
+        "best_bid": _num(m.get("bestBid")),
+        "best_ask": _num(m.get("bestAsk")),
         "end_date": m.get("endDate"),
         "active": m.get("active"),
         "closed": m.get("closed"),
