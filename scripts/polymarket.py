@@ -83,6 +83,7 @@ def normalize_market(m):
         "id": m.get("id"),
         "slug": m.get("slug"),
         "question": m.get("question"),
+        "label": m.get("groupItemTitle") or None,  # short option name inside a multi-market event
         "condition_id": m.get("conditionId"),
         "outcomes": outcomes,
         "volume": _num(m.get("volumeNum", m.get("volume"))),
