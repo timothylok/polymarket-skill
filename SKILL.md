@@ -5,7 +5,7 @@ description: Query live Polymarket prediction-market odds — search events, top
 
 # Polymarket (read-only)
 
-Stdlib-only Python 3.8+ client for Polymarket's public APIs. One file, `scripts/polymarket.py`, is both a CLI and an importable module. No dependencies, no credentials.
+Stdlib-only Python 3.9+ client for Polymarket's public APIs. One file, `scripts/polymarket.py`, is both a CLI and an importable module. No dependencies, no credentials.
 
 ## Use this when
 
@@ -71,6 +71,10 @@ Functions raise `pm.PolymarketError` on failure.
 - CLOB `https://clob.polymarket.com` — `/midpoint`, `/book` (levels arrive unsorted for best price; the client sorts), `/prices-history`. History enforces a minimum `fidelity` (minutes/point): 5 for `1w`, 10 for `1m`; the client applies defaults and clamps.
 - Data `https://data-api.polymarket.com` — `/trades?market=<conditionId>`.
 - Gamma prices (`outcomePrices`) can lag the CLOB midpoint by a tick; use `price` when it matters.
+
+## Tests
+
+`python -m unittest discover -s tests` runs offline (the HTTP layer is faked). `python tests/smoke_live.py` hits the real APIs; CI runs it weekly and on manual dispatch to catch upstream changes.
 
 ## Reuse in another repo
 

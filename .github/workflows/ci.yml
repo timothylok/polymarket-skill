@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 20 * * 1" # Mondays 20:17 UTC -- live API drift check
+  workflow_dispatch:
+
+jobs:
+  test:
+    # Offline: polymarket._get is faked, so pushes never go red because
+    # Polymarket is slow or down.
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.13"] # oldest and newest supported; stdlib only
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Syntax-check
+        run: python -m compileall -q scripts tests
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+  live-smoke:
+    # Hits the real public APIs to catch upstream changes (renamed fields, new
+    # required params). Weekly and on demand only, so network flakiness never
+    # blocks a push.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: python tests/smoke_live.py
